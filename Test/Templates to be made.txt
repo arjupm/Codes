@@ -1,5 +1,0 @@
-logging framework
-Exception handling
-general properties to be set
-databse 
-sqs sap confiuration
