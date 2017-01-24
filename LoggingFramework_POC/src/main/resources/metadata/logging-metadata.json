@@ -1,0 +1,56 @@
+{
+	"_comment": "The below logging entries contains dummy data, can be changed based on requirement",
+	"logging-metadata-entries": [
+		{
+			"entry": {
+				"id": "flow-entry-log",
+				"statusValue": "success",
+				"executionPointValue": "start of a flow",
+				"resourceTypeValue": "SQS",
+				"payloadValue":"payload"
+			}
+		},
+		{
+			"entry": {
+				"id": "flow-exit-Log",
+				"statusValue": "success",
+				"executionPointValue": "end of a flow",
+				"resourceTypeValue": "flow",
+				"resourceNameValue": "main-flow",
+				"payloadValue":"payloadAttribute"
+			}
+		},
+		{
+			"entry": {
+				"id": "subflow-entry-Log",
+				"statusValue": "success",
+				"executionPointValue": "within a subflow",
+				"resourceTypeValue": "flow",
+				"resourceNameValue": "",
+				"payloadValue":"payloadAttribute"
+			}
+		},
+		{
+			"entry": {
+				"id": "subflow-exit-log",
+				"statusValue": "success",
+				"executionPointValue": "within a subflow",
+				"resourceTypeValue": "flow",
+				"resourceNameValue": "sub-flow",
+				"payloadValue":"payload"
+			}
+		},
+		{
+			"entry": {
+				"id": "NullPointerException",
+				"statusValue": "exception occurs",
+				"executionPointValue": "exception handling",
+				"resourceTypeValue": "flow",
+				"resourceNameValue": "flow name where possibility of this exception",
+				"errorCodeValue": "E104",
+				"errorTypeValue": "java.lang.NullPointerException",
+				"payloadValue":"payloadAttribute"
+			}
+		}
+	]
+}

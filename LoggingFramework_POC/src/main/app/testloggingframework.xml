@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<context:property-placeholder location="properties/loggingsetup.properties"/>
+	<spring:beans>
+         <spring:import resource="classpath:logging-config.xml"/>
+    </spring:beans>
+    <http:listener-config name="HTTP_Listener_Configuration" host="localhost" port="1000" doc:name="HTTP Listener Configuration"/>
+    <flow name="testloggingframeworkFlow">
+      <composite-source doc:name="Composite Source">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/log" doc:name="Apigee Source "/>
+        <poll doc:name="Poll">
+            <fixed-frequency-scheduler frequency="20" startDelay="1" timeUnit="SECONDS"/>
+            <logger level="INFO" message="FlowStarts" doc:name="Normal Source"/>
+        </poll>  
+        </composite-source>
+        <object-to-string-transformer doc:name="Object to String"/>
+ 
+        <!-- <logger message="#[message]" level="INFO" doc:name="MuleMessage"/> -->
+        <!-- <set-variable variableName="payloadAttributesValue" value="#[new java.util.HashMap()]"  doc:name="Set payload attributes map variable" />
+        <expression-component doc:name="Expression"><![CDATA[flowVars.payloadAttributesValue.put('Correlation ID', message.correlationId); ]]>
+	    </expression-component> -->
+        <!-- <set-variable variableName="groupIDValue" value="#['file_'+server.dateTime.format('yyyy-MM-dd hh:mm:ss:SS')+'.txt']" doc:name="GroupID"/> -->
+       <!--  <set-variable value="payload" variableName="payloadValue" doc:name="payloadValue"/> -->
+         <set-payload value="#['payload']" doc:name="Set Payload"/>
+        <set-variable variableName="loggingEntry" value="flow-entry-log" doc:name="logging-entry"/>
+        <logger message="#[LoggingAppendString]" level="INFO" doc:name="Start LOG"/>
+        <scripting:component doc:name="Groovy">
+            <scripting:script engine="Groovy"><![CDATA[throw new java.lang.NullPointerException('Exception Block');]]></scripting:script>
+        </scripting:component>
+        <!-- <flow-ref name="testloggingframeworkSub_Flow" doc:name="Flow Reference"/> -->
+        <set-variable variableName="loggingEntry" value="flow-exit-Log" doc:name="logging-entry"/>
+        <logger message="#[LoggingAppendString]" level="INFO" doc:name="End LOG"/>
+       <choice-exception-strategy doc:name="Choice Exception Strategy">
+          <catch-exception-strategy when="#[exception.causedBy(java.lang.NullPointerException) || exception.causedBy(java.lang.Exception)]" doc:name="Catch Exception Strategy">
+             <set-variable variableName="loggingEntry" value="NullPointerException" doc:name="logging-entry"/>
+             <logger message="#[LoggingAppendString]" level="ERROR" doc:name="Error LOG"/>
+          </catch-exception-strategy>
+       </choice-exception-strategy>
+    </flow>
+    
+    
+    <sub-flow name="testloggingframeworkSub_Flow">
+        <scripting:component doc:name="Setting CorrelationID">
+            <scripting:script engine="Groovy"><![CDATA[message.correlationId='98010101010101';]]></scripting:script>
+        </scripting:component>
+        <set-payload value="#['payload']" doc:name="Set Payload"/>
+       <!--  <expression-component doc:name="Expression"><![CDATA[flowVars.payloadAttributesValue.put('Correlation ID', message.correlationId); ]]>
+	    </expression-component> -->
+        <set-variable variableName="resourceNameValue" value="#['hi sub-flow']" doc:name="ResourceNameValue" />
+        <set-variable variableName="loggingEntry" value="subflow-entry-Log" doc:name="logging-entry"/>
+        <logger message="#[LoggingAppendString]" level="INFO" doc:name="Logging Framework"/>
+        <set-variable variableName="loggingEntry" value="subflow-exit-log" doc:name="logging-entry"/>       
+        <logger message="#[LoggingAppendString]" level="INFO" doc:name="Logger"/>
+       <!--  <message-properties-transformer scope="invocation" doc:name="Message Properties">
+            <add-message-property key="testing" value="testing Value"/>
+        </message-properties-transformer>
+        <logger message="#[testing]" level="INFO" doc:name="Logger"/> -->
+        
+    </sub-flow>
+</mule>
