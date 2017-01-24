@@ -1,0 +1,20 @@
+Note:- CorrelationID should be upto 14 digits.
+
+If CorrelationID is coming from Apigee(should starts from 99)
+--------------------------------------
+<set-session-variable variableName="CorrelationID" value="#[message.inboundProperties.'http.query.params'.correlationID]" doc:name="CorrelationID received from Apigee" />
+
+
+If CorrelationID is not coming from Apigee(should starts from 98)
+------------------------------------------
+1st Method(issue)
+----------
+<set-session-variable variableName="correlationID" value="#['981001'+ Math.abs(new Random().nextInt() % 99999999)]" doc:name="CorrelationID"/>
+
+2nd Method
+----------
+<set-session-variable variableName="CorrelationID" value="#["98"+new Long (java.util.concurrent.ThreadLocalRandom.current().nextLong(100000000000L, 1000000000000L)).toString();]" 
+doc:name="CorrelationID "/>
+
+
+                       
